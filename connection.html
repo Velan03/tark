@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tarkiz Infotech - Connect, Innovate, Empower</title>
+    <!-- Bootstrap 5 for layout -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+
+    <style>
+        /* Custom Variables and Base Styles */
+        :root {
+            --primary: #89161f;
+            /* Deep Red/Maroon */
+            --secondary: #000000;
+            /* Black */
+            --white: #ffffff;
+            /* White */
+            --reveal-color: var(--secondary);
+            /* Text reveal color on home screen */
+            --grid-color: #891620;
+            /* Color for the grid overlay */
+            --bg-color: #f7f7f7;
+            /* Light off-white background */
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--secondary);
+            background: var(--bg-color);
+            overflow-x: hidden;
+        }
+
+        /* 3D Container for Three.js */
+        .three-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            /* Below content, above background */
+        }
+
+        /* Nav Bar Styles */
+        .top-nav {
+            background-color: transparent !important;
+            padding: 1rem 0;
+            position: relative;
+            z-index: 100;
+        }
+
+        .top-nav .nav-link {
+            text-transform: uppercase;
+            position: relative;
+            font-weight: 500;
+            margin-left: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .top-nav .nav-link.active {
+            color: var(--secondary) !important;
+            font-weight: 800;
+        }
+
+        .top-nav-item .nav-link.active::before {
+            content: "[";
+            left: -0.6rem;
+            color: var(--primary) !important;
+            font-weight: 800;
+            position: absolute;
+            opacity: 0.6;
+        }
+
+        .top-nav-item .nav-link.active::after {
+            content: "]";
+            right: -0.6rem;
+            color: var(--primary) !important;
+            font-weight: 800;
+            position: absolute;
+            opacity: 0.6;
+        }
+
+        .top-nav .nav-link:hover,
+        .top-nav .nav-link.active,
+        .top-nav .nav-link:focus {
+            color: var(--primary) !important;
+        }
+
+        .contact-btn {
+            background: var(--secondary);
+            color: var(--white) !important;
+            padding: 0.8rem 2rem !important;
+            border-radius: 0.75rem !important;
+            text-decoration: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .contact-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Side Nav (Vertical) */
+        .side-nav {
+            position: absolute;
+            height: 60vh;
+            display: flex;
+            z-index: 10;
+        }
+
+        .side-nav-item {
+            transform: rotate(-90deg);
+            transform-origin: center;
+            position: relative;
+        }
+
+        .side-nav-item .nav-link {
+            color: var(--secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            position: relative;
+            padding-left: 1.5rem;
+            transition: color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .side-nav-item .nav-link::before {
+            content: "";
+            position: absolute;
+            left: 0.7rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0.4rem;
+            height: 0.4rem;
+            background-color: var(--secondary); 
+            transition: background-color 0.3s ease;
+        }
+
+        .side-nav-item .nav-link.active::before {
+            background-color: var(--primary);
+            box-shadow: 0 0 5px var(--primary);
+        }
+
+        .side-nav-item .nav-link.active,
+        .side-nav-item .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .side-nav-item .nav-link:hover::before {
+            background-color: var(--primary);
+        }
+
+        /* Hero Content and Grid Overlay */
+        .main-content {
+            position: relative;
+            z-index: 5;
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: -15vh !important;
+            inset: 0;
+            z-index: 0;
+            background: linear-gradient(to bottom, #ffffff00, #89162060),
+                linear-gradient(to right, rgb(255, 255, 255) 1px, transparent 1px),
+                linear-gradient(to bottom, rgb(255, 255, 255) 1px, #8916207d 1px);
+            background-size: 100% 100%, 48px 48px, 48px 48px;
+            box-shadow: inset 0 0 50px rgba(135, 5, 5, 0.61);
+            -webkit-mask-image: radial-gradient(80% 60% at 50% 40%,
+                    #840a0a7e 10%,
+                    transparent 70%);
+            mask-image: radial-gradient(80% 60% at 50% 50%,
+                    #840a0a7e 10%,
+                    transparent 70%);
+            pointer-events: none;
+            height: 55vh;
+        }
+
+        /* Large Title Animation */
+        .connect-style {
+            position: relative;
+            font-size: clamp(3rem, 12vw, 220px);
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: transparent;
+            text-align: center;
+        }
+
+        /* Brackets */
+        .connect-style::before,
+        .connect-style::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 900;
+            color: var(--primary);
+            font-size: inherit;
+            white-space: nowrap;
+        }
+
+        .connect-style::before {
+            content: "[";
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: bracket-slide-open 0.8s forwards ease-out;
+            animation-delay: 0.2s;
+        }
+
+        .connect-style::after {
+            content: "]";
+            right: 50%;
+            transform: translate(50%, -50%);
+            animation: bracket-slide-open-right 0.8s forwards ease-out;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes bracket-slide-open {
+            to {
+                left: clamp(0%, 5% - 2rem, 4rem);
+                /* Responsive final position */
+                transform: translateY(-50%);
+                opacity: 1;
+            }
+        }
+
+        @keyframes bracket-slide-open-right {
+            to {
+                right: clamp(0%, 5% - 2rem, 4rem);
+                /* Responsive final position */
+                transform: translateY(-50%);
+                opacity: 1;
+            }
+        }
+
+        /* Letter Reveal */
+        .connect-style span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: text-reveal 0.6s forwards;
+        }
+
+        /* Staggered delay for each letter */
+        .connect-style span:nth-child(1) {
+            animation-delay: 0.6s;
+        }
+
+        .connect-style span:nth-child(2) {
+            animation-delay: 0.7s;
+        }
+
+        .connect-style span:nth-child(3) {
+            animation-delay: 0.8s;
+        }
+
+        .connect-style span:nth-child(4) {
+            animation-delay: 0.9s;
+        }
+
+        .connect-style span:nth-child(5) {
+            animation-delay: 1.0s;
+        }
+
+        .connect-style span:nth-child(6) {
+            animation-delay: 1.1s;
+        }
+
+        .connect-style span:nth-child(7) {
+            animation-delay: 1.2s;
+        }
+
+
+        @keyframes text-reveal {
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                color: var(--white);
+                /* Reveal the actual text color */
+            }
+        }
+
+        /* Footer */
+        footer {
+            width: 100%;
+            padding: 0 2rem;
+            position: absolute;
+            bottom: 2rem;
+            z-index: 10;
+        }
+
+        .social-icons ul {
+            list-style: none;
+            display: flex;
+            gap: 1rem;
+            justify-content: start;
+            margin: 0 0 0.5rem;
+            padding: 0;
+        }
+
+        .social-icons li a {
+            color: var(--secondary);
+            font-size: 1.25rem;
+            transition: color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .social-icons li a:hover {
+            color: var(--primary);
+        }
+
+        .para-content p {
+            margin: 0;
+            max-width: 56rem;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        /* Services Section */
+        .section-pad {
+            padding-block: 6rem;
+        }
+
+        .sec-title {
+            color: var(--primary);
+            font-weight: 900;
+            font-size: clamp(2.5rem, 4.5vw, 5rem);
+            margin-bottom: 1rem;
+        }
+
+        /* Card stack (left) */
+        .custom-cards {
+            position: relative;
+            width: 217px;
+            height: 264px;
+            margin-inline: auto;
+            cursor: pointer;
+            perspective: 1000px;
+        }
+
+        .custom-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), inset 0 0 8px 4px #cfcaca;
+            border-radius: 1.5rem;
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            border: 1px solid #eee;
+            /* Transition for the reveal */
+            transition: transform 0.6s cubic-bezier(.22, .61, .36, 1), opacity 0.6s cubic-bezier(.22, .61, .36, 1), box-shadow 0.3s;
+        }
+
+        .custom-slide:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .custom-slide:nth-child(1) {
+            z-index: 4
+        }
+
+        .custom-slide:nth-child(2) {
+            transform: translateY(10px) scale(.98);
+            z-index: 3
+        }
+
+        .custom-slide:nth-child(3) {
+            transform: translateY(20px) scale(.96);
+            z-index: 2
+        }
+
+        .custom-slide:nth-child(4) {
+            transform: translateY(30px) scale(.94);
+            z-index: 1
+        }
+
+        /* Hover effect */
+        .custom-cards:hover .custom-slide:nth-child(1) {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15), inset 0 0 8px 4px #cfcaca;
+        }
+
+        /* Target cards (right) */
+        .show-card {
+            width: 217px;
+            height: 264px;
+            background-color: transparent;
+            box-shadow: inset 0 0 10px 5px transparent;
+            border-radius: 1.5rem;
+            border: 0;
+            z-index: -1;
+        }
+
+        /* Reveal when scrolled into view using Intersection Observer classes */
+        .reveal-prep .custom-slide {
+            opacity: 0;
+            transform: translateY(40px) scale(0.9) !important;
+        }
+
+        .reveal-active .custom-slide {
+            opacity: 1;
+            /* Reset to the stacked position via CSS */
+        }
+
+        /* Re-apply the initial stacked transforms with staggered delay */
+        .reveal-active .custom-slide:nth-child(1) {
+            transform: translateY(0) scale(1);
+        }
+
+        .reveal-active .custom-slide:nth-child(2) {
+            transition-delay: .08s;
+            transform: translateY(10px) scale(.98);
+        }
+
+        .reveal-active .custom-slide:nth-child(3) {
+            transition-delay: .16s;
+            transform: translateY(20px) scale(.96);
+        }
+
+        .reveal-active .custom-slide:nth-child(4) {
+            transition-delay: .24s;
+            transform: translateY(30px) scale(.94);
+        }
+
+        /* Utility */
+        .vh-100 {
+            height: 100vh !important;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .side-nav {
+                display: none;
+            }
+
+            .top-nav .navbar-collapse {
+                background-color: rgba(255, 255, 255, 0.98);
+                padding: 1rem;
+                border-radius: 0.5rem;
+                margin-top: 1rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+
+            .top-nav .nav-link {
+                margin-left: 0;
+                padding: 0.5rem 0;
+            }
+
+            .top-nav-item .nav-link.active::before,
+            .top-nav-item .nav-link.active::after {
+                display: none;
+            }
+
+            footer {
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
+                bottom: 1rem;
+            }
+
+            .social-icons ul {
+                justify-content: center;
+            }
+
+            .para-content p {
+                text-align: center;
+                width: 100% !important;
+            }
+
+            /* Ensure brackets don't run off screen on small devices */
+            @keyframes bracket-slide-open {
+                to {
+                    left: 0.5rem;
+                }
+            }
+
+            @keyframes bracket-slide-open-right {
+                to {
+                    right: 0.5rem;
+                }
+            }
+        }
+
+        @media (max-width: 768px) {
+            .connect-style {
+                font-size: clamp(2rem, 10vw, 8rem);
+            }
+
+            .bottom-content .row {
+                flex-direction: column;
+            }
+
+            .bottom-content .col-xl-3,
+            .bottom-content .col-xl-9 {
+                width: 100% !important;
+                max-width: 100%;
+                flex: 0 0 100%;
+            }
+
+            .bottom-content .col-xl-9 {
+                margin-top: 2rem;
+            }
+
+            .show-card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Home Section (Full height, with 3D background) -->
+    <section id="home" class="nav-section position-relative" style=" height: 85vh !important;">
+        <!-- Three.js Container -->
+        <div id="three-container" class="three-container"></div>
+
+        <!-- Navbar -->
+        <nav class="top-nav navbar navbar-expand-lg px-3 position-relative">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <!-- Placeholder Logo -->
+                    <img src="https://placehold.co/145x57/89161f/ffffff?text=Tarkiz+Logo" alt="Tarkiz Logo" width="145"
+                        height="57" class="img-fluid rounded">
+                </a>
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                    <ul class="navbar-nav mb-2 mb-lg-0 d-flex align-items-center justify-content-lg-around w-lg-50">
+                        <li class="top-nav-item nav-item"><a class="nav-link active" href="#home">Home</a></li>
+                        <li class="top-nav-item nav-item"><a class="nav-link" href="#about">About us</a></li>
+                        <li class="top-nav-item nav-item"><a class="nav-link" href="#services">Services</a></li>
+                        <li class="top-nav-item nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                        <li class="top-nav-item nav-item">
+                            <a class="contact-btn rounded-4 text-white" href="#contact">Contact Us</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid h-100 position-relative d-flex flex-column">
+            <!-- Main Hero Content Row -->
+            <div class="row flex-grow-1">
+                <!-- Side Nav Column (Desktop only) -->
+                <div class="col-lg-1 mt-5 d-none d-lg-flex align-items-center h-75 justify-content-center">
+                    <aside class="side-nav">
+                        <ul
+                            class="nav-ul list-unstyled d-flex flex-column align-items-center justify-content-between m-0 h-100">
+                            <li class="side-nav-item"><a class="nav-link" href="#innovate">Innovate</a></li>
+                            <li class="side-nav-item"><a class="nav-link" href="#empower">Empower</a></li>
+                            <li class="side-nav-item"><a class="nav-link" href="#transform">Transform</a></li>
+                            <li class="side-nav-item"><a class="nav-link" href="#advance">Advance</a></li>
+                            <li class="side-nav-item"><a class="nav-link" href="#thrive">Thrive</a></li>
+                            <li class="side-nav-item"><a class="nav-link active" href="#home">Connect</a></li>
+                        </ul>
+                    </aside>
+                </div>
+
+                <!-- Main Title Column -->
+                <div class="col-lg-11 d-flex align-items-center justify-content-center position-relative">
+                    <main class="main-content w-100">
+                        <div class="grid-overlay"></div>
+                        <h1 class="connect-style">
+                            <span>C</span><span>O</span><span>N</span><span>N</span><span>E</span><span>C</span><span>T</span>
+                        </h1>
+                    </main>
+                </div>
+            </div>
+
+            <!-- Footer (Always positioned at the bottom of the vh-100 section) -->
+            <footer class="container-fluid d-flex justify-content-center">
+                <div class="row w-75 align-items-end justify-content-between">
+                    <div class="col-md-6 col-12">
+                        <div class="social-icons">
+                            <ul class="list-unstyled d-flex gap-3 m-0">
+                                <li>
+                                    <a href="#" aria-label="Instagram"
+                                        class="text-decoration-none social-link d-flex align-items-center justify-content-center p-2 bg-secondary bg-opacity-10 rounded-circle text-dark">
+                                        <i class="fa-brands fa-instagram "></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" aria-label="Facebook"
+                                        class="text-decoration-none social-link d-flex align-items-center justify-content-center p-2 bg-secondary bg-opacity-10 rounded-circle text-dark">
+                                        <i class="fab fa-facebook"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" aria-label="Twitter"
+                                        class="text-decoration-none social-link d-flex align-items-center justify-content-center p-2 bg-secondary bg-opacity-10 rounded-circle text-dark">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-12">
+                        <div class="para-content text-md-end text-center mt-3 mt-md-0">
+                            <p class="text-uppercase fs-6 w-100 text-md-start text-sm-center">
+                                Seamless integration and smart systems that bring people, data, and goals together.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <main id="services" class="section-pad">
+        <div class="container">
+            <div class="mb-5">
+                <h2 class="sec-title text-uppercase">Industries & Services</h2>
+            </div>
+
+            <div class="row gy-5 align-items-center">
+                <!-- Left Column: Card Stack -->
+                <div class="col-12 col-lg-6 d-flex justify-content-center">
+                    <div id="stack" class="custom-cards reveal-prep">
+                        <article class="custom-slide rounded-4" data-target="0" aria-label="Health & Care card">
+                            <div class="p-3 text-center">
+                                <h3 class="h5 fw-bold mb-1 text-danger">Health &amp; Care</h3>
+                                <p class="mb-0 small">Improving patient experiences, securing data, and maximizing
+                                    operational efficiency through intelligent systems.</p>
+                            </div>
+                        </article>
+
+                        <article class="custom-slide rounded-4" data-target="1" aria-label="Retail Solutions card">
+                            <div class="p-3 text-center">
+                                <h3 class="h5 fw-bold mb-1 text-danger">Retail Solutions</h3>
+                                <p class="mb-0 small">Optimizing customer journeys, supply chain logistics, and in-store
+                                    operations to drive measurable growth.</p>
+                            </div>
+                        </article>
+
+                        <article class="custom-slide rounded-4" data-target="2"
+                            aria-label="Bank/Financial Services card">
+                            <div class="p-3 text-center">
+                                <h3 class="h5 fw-bold mb-1 text-danger">Bank / Financial</h3>
+                                <p class="mb-0 small">Implementing secure, seamless platforms for customer interactions,
+                                    risk management, and regulatory compliance.</p>
+                            </div>
+                        </article>
+
+                        <article class="custom-slide rounded-4" data-target="3" aria-label="Business/IT Services card">
+                            <div class="p-3 text-center">
+                                <h3 class="h5 fw-bold mb-1 text-danger">Business / IT</h3>
+                                <p class="mb-0 small">Delivering scalable cloud infrastructure, bespoke software
+                                    development, and strategic IT consulting that empowers teams.</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <!-- Right Column: Description and CTA -->
+                <div class="col-12 col-lg-6 d-flex flex-column justify-content-center gap-4">
+                    <div>
+                        <h3 class="fw-bold h4 mb-3 text-secondary">A Global Approach to Digital Transformation</h3>
+                        <p class="lead mb-4">
+                            TARKIZ Infotech delivers intelligent solutions and consulting for secure, efficient access
+                            and communication across organizations and governments worldwide. We specialize in building
+                            the digital backbone for tomorrow's leaders.
+                        </p>
+                        <a class="contact-btn text-white" href="#contact">Explore Our Case Studies</a>
+                    </div>
+                    <div class="text-muted small d-flex align-items-center gap-2 mt-4">
+                        <span class="d-inline-block">Scroll to see our solutions in action</span>
+                        <span aria-hidden="true">↓</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Content: Target Area for Card Movement -->
+            <div id="solutions" class="row align-items-center mt-5 pt-5 bottom-content">
+                <div class="col-12 col-xl-3 mb-4 mb-xl-0">
+                    <h3 class="fw-bold h4 mb-3">Solutions Across Industries</h3>
+                    <p class="text-muted small mb-3">Watch the cards on the left distribute to show how our expertise
+                        covers various sectors.</p>
+                    <a class="contact-btn text-white" href="#contact">Book Your Project</a>
+                </div>
+                <div class="col-12 col-xl-9">
+                    <div class="row g-3 justify-content-center justify-content-xl-between">
+                        <!-- Target Cards (Will be visually 'filled' by the stack cards) -->
+                        <div class="col-auto">
+                            <div class="card show-card" data-index="0" aria-label="Health Target"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="card show-card" data-index="1" aria-label="Retail Target"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="card show-card" data-index="2" aria-label="Financial Target"></div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="card show-card" data-index="3" aria-label="IT Target"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Three.js for 3D Background -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js"></script>
+
+    <script>
+        // --- Three.js Background Particle Setup ---
+        let scene, camera, renderer, particles, particleCount, particleGeometry, particleMaterial;
+
+        function initThree() {
+            const container = document.getElementById('three-container');
+            if (!container) return;
+
+            // Scene setup
+            scene = new THREE.Scene();
+
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 25;
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setClearColor(0x000000, 0);
+            container.appendChild(renderer.domElement);
+            onWindowResize();
+            animateThree();
+        }
+
+        function animateThree() {
+            requestAnimationFrame(animateThree);
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('three-container');
+            if (!container) return;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        // --- Card Animation Logic ---
+        function initCardAnimations() {
+            const stack = document.getElementById('stack');
+            const slides = Array.from(stack.querySelectorAll('.custom-slide'));
+            const targetCards = Array.from(document.querySelectorAll('.show-card'));
+            const bottomContent = document.querySelector('.bottom-content');
+
+            // 1. Reveal stack when in view
+            const revealObs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Apply active state to trigger the staggered CSS transition
+                        stack.classList.remove('reveal-prep');
+                        stack.classList.add('reveal-active');
+                        revealObs.disconnect();
+                    }
+                });
+            }, { threshold: 0.25 });
+            revealObs.observe(stack);
+
+            let appliedMove = false;
+
+            function moveSlides() {
+                if (appliedMove) return;
+
+                // --- inside moveSlides() ---
+                let baseDy = null; // to store consistent vertical translation
+
+                slides.forEach((slide, i) => {
+                    const card = targetCards[i];
+                    if (!card) return;
+
+                    // Reset for accurate measurements
+                    slide.style.transition = 'none';
+                    slide.style.transform = '';
+                    void slide.offsetWidth;
+
+                    const slideRect = slide.getBoundingClientRect();
+                    const cardRect = card.getBoundingClientRect();
+
+                    const dx = (cardRect.left + cardRect.width / 2) - (slideRect.left + slideRect.width / 2);
+                    let dy = (cardRect.top + cardRect.height / 2) - (slideRect.top + slideRect.height / 2);
+
+                    // Use the dy from the first slide as the baseline for all others (above 1024px)
+                    if (window.innerWidth > 1024) {
+                        if (baseDy === null) baseDy = dy;
+                        dy = baseDy;
+                    }
+
+                    console.log(`Slide ${i} → dx: ${dx.toFixed(1)}, dy: ${dy.toFixed(1)}`);
+
+                    slide.style.transition = `transform 800ms cubic-bezier(.68,-0.55,0.27,1.55) ${i * 0.2}s, border-radius 800ms`;
+                    slide.style.transform = `translate(${dx}px, ${dy}px) scale(1) rotate(0deg)`;
+                    slide.style.borderRadius = '1.5rem';
+                    slide.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+                });
+
+
+                appliedMove = true;
+            }
+
+            // 2. Move slides to target cards when bottom section is visible
+            const moveObs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        moveSlides();
+                    } else if (appliedMove) {
+                        // Optional: reset cards if user scrolls up past the trigger point
+                        appliedMove = false;
+                        slides.forEach((s) => {
+                            s.style.transition = 'transform 600ms cubic-bezier(.22,.61,.36,1), opacity 0.6s cubic-bezier(.22,.61,.36,1), box-shadow 0.3s';
+                            s.style.transform = ''; // Reset CSS transform to initial stacked positions
+                            s.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08), inset 0 0 8px 4px #cfcaca';
+                        });
+                    }
+                });
+            }, { threshold: 0.5 }); // Trigger when 50% of the target is visible
+            moveObs.observe(bottomContent);
+
+            // 3. Recompute on resize if needed
+            let resizeTimeout;
+            window.addEventListener('resize', () => {
+                onWindowResize(); // Handle Three.js resize
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    // Only recalculate position if the animation has been triggered at least once
+                    if (appliedMove) {
+                        appliedMove = false; // reset flag
+                        // Force layout reset and recalculate on the next frame
+                        slides.forEach(s => {
+                            s.style.transition = 'none';
+                            s.style.transform = '';
+                        });
+                        // Use requestAnimationFrame for reliable recalculation after layout shift
+                        requestAnimationFrame(() => requestAnimationFrame(moveSlides));
+                    }
+                }, 150);
+            });
+        }
+
+        // Initialize everything once the window loads
+        window.onload = function () {
+            initThree();
+            initCardAnimations();
+        };
+
+    </script>
+</body>
+
+</html>
